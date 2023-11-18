@@ -24,17 +24,17 @@ void SimpleShapeApplication::init() {
 
     // A vector containing the x,y,z vertex coordinates for the triangle.
     std::vector<GLfloat> vertices = {
-        -0.5f, 0.0f, 0.0f,  0.5f,0.5f,0.5f,
-        0.5f, 0.0f, 0.0f,   0.5f,0.5f,0.5f,
-        0.0f, 0.5f, 0.0f,   0.5f,0.5f,0.5f,
+        -0.5f, 0.0f, 0.0f,  0.1f,0.5f,0.1f,
+        0.5f, 0.0f, 0.0f,   0.1f,0.5f,0.1f,
+        0.0f, 0.5f, 0.0f,   0.1f,0.5f,0.1f,
 
-        -0.5f, -0.5f, 0.0f, 0.5f,0.5f,0.5f,
-        0.5f, -0.5f, 0.0f,  0.5f,0.5f,0.5f,
-        -0.5f,  0.0f, 0.0f, 0.5f,0.5f,0.5f,
+        -0.5f, -0.5f, 0.0f, 0.5f,0.1f,0.1f,
+        0.5f, -0.5f, 0.0f,  0.5f,0.1f,0.1f,
+        -0.5f,  0.0f, 0.0f, 0.5f,0.1f,0.1f,
 
-        0.5f, -0.5f, 0.0f,  0.5f,0.5f,0.5f,
-        -0.5f, 0.0f, 0.0f,  0.5f,0.5f,0.5f,
-        0.5f,  0.0f, 0.0f,  0.5f,0.5f,0.5f};
+        0.5f, -0.5f, 0.0f,  0.1f,0.1f,0.5f,
+        -0.5f, 0.0f, 0.0f,  0.1f,0.1f,0.5f,
+        0.5f,  0.0f, 0.0f,  0.1f,0.1f,0.5f};
 
     // Generating the buffer and loading the vertex data into it.
     GLuint v_buffer_handle;
@@ -56,7 +56,7 @@ void SimpleShapeApplication::init() {
     
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(0));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(3*sizeof(GLfloat)));
     
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
