@@ -24,17 +24,17 @@ void SimpleShapeApplication::init() {
 
     // A vector containing the x,y,z vertex coordinates for the triangle.
     std::vector<GLfloat> vertices = {
-        -0.5f, 0.4f, 0.0f,
-         0.5f, 0.4f, 0.0f,
-         0.0f,  .9f, 0.0f,
+        -0.5f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f,
 
-        -0.5f, -0.1f, 0.0f,
-         0.5f, -0.1f, 0.0f,
-         -0.5f,  0.4f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+         -0.5f,  0.0f, 0.0f,
 
-        0.5f, -0.1f, 0.0f,
-         -0.5f, 0.4f, 0.0f,
-         0.5f,  0.4f, 0.0f,};
+        0.5f, -0.5f, 0.0f,
+         -0.5f, 0.0f, 0.0f,
+         0.5f,  0.0f, 0.0f,};
 
     // Generating the buffer and loading the vertex data into it.
     GLuint v_buffer_handle;
