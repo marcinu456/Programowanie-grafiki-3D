@@ -4,16 +4,26 @@
 
 #include "app.h"
 
+#include <dinput.h>
+#include <iostream>
 #include <vector>
 #include <tuple>
-#define _WIN32_WINNT  0x0501 // I misunderstand that
-#include <windows.h>
-#include <iostream>
-#include <cstdlib>
-
 
 #include "Application/utils.h"
 
+
+void ReadRam()
+{
+    //int pmc;
+    //GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+    MEMORYSTATUSEX statex;
+
+    statex.dwLength = sizeof (statex); // I misunderstand that
+
+    GlobalMemoryStatusEx (&statex);
+    std::cout << "Physical RAM => " << (float)statex.ullTotalPhys/(1024*1024*1024)<< std::endl;
+
+}
 
 void SimpleShapeApplication::init() {
     // A utility function that reads the shader sources, compiles them and creates the program object
@@ -29,19 +39,15 @@ void SimpleShapeApplication::init() {
 
     // A vector containing the x,y,z vertex coordinates for the triangle.
     std::vector<GLfloat> vertices = {
-        -0.5f, 0.0f, 0.0f,  0.1f,0.5f,0.1f,
-        0.5f, 0.0f, 0.0f,   0.1f,0.5f,0.1f,
-        0.0f, 0.5f, 0.0f,   0.1f,0.5f,0.1f,
+        -0.5f, 0.0f, 0.0f,  0.81f,0.1f,0.1f,
+        0.5f, 0.0f, 0.0f,   0.81f,0.1f,0.1f,
+        0.0f, 0.5f, 0.0f,   0.81f,0.1f,0.1f,
+        -0.5f, 0.0f, 0.0f,  0.31f,0.1f,0.251f,
+        -0.5f, -0.5f, 0.0f, 0.31f,0.1f,0.251f,
+        0.5f, -0.5f, 0.0f,  0.31f,0.1f,0.251f,
+        0.5f,  0.0f, 0.0f,  0.31f,0.1f,0.251f};
 
-        -0.5f, -0.5f, 0.0f, 0.5f,0.1f,0.1f,
-        0.5f, -0.5f, 0.0f,  0.5f,0.1f,0.1f,
-        -0.5f,  0.0f, 0.0f, 0.5f,0.1f,0.1f,
-
-        0.5f, -0.5f, 0.0f,  0.1f,0.1f,0.5f,
-        -0.5f, 0.0f, 0.0f,  0.1f,0.1f,0.5f,
-        0.5f,  0.0f, 0.0f,  0.1f,0.1f,0.5f};
-
-   // std::vector<GLushort> indices = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    std::vector<GLushort> indices = {0,1,2,3,4,5,6};
     
     // Generating the buffer and loading the vertex data into it.
     GLuint v_buffer_handle;
@@ -50,11 +56,19 @@ void SimpleShapeApplication::init() {
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    //generating indices buffer object
+    GLuint idx_buffer_handle;
+    glGenBuffers(1, &idx_buffer_handle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
     // This setups a Vertex Array Object (VAO) that  encapsulates
     // the state of all vertex buffers needed for rendering
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
     glBindBuffer(GL_ARRAY_BUFFER, v_buffer_handle);
+
 
     // This indicates that the data for attribute 0 should be read from a vertex buffer.
     glEnableVertexAttribArray(0);
@@ -64,14 +78,12 @@ void SimpleShapeApplication::init() {
     glEnableVertexAttribArray(1);
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(3*sizeof(GLfloat)));
-    
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
     glBindVertexArray(0);
     //end of vao "recording"
 
-    Uniform();
-
+    
 
     // Setting the background color of the rendering window,
     // I suggest not to use white or black for better debuging.
@@ -88,28 +100,8 @@ void SimpleShapeApplication::init() {
 void SimpleShapeApplication::frame() {
     // Binding the VAO will setup all the required vertex buffers.
     glBindVertexArray(vao_);
-    glDrawArrays(GL_TRIANGLES, 0, 9);
+    //glDrawArrays(GL_TRIANGLES, 0, 9);
+    glDrawElements(GL_TRIANGLE_STRIP, 8, GL_UNSIGNED_SHORT, reinterpret_cast<GLvoid *>(0));
     glBindVertexArray(0);
-    
-}
-
-void SimpleShapeApplication::Uniform()
-{
-    // Generating the buffer and loading the vertex data into it.
-    GLuint v_buffer_handle;
-    
-    float strength=.25;
-    float color[3] ={1.5f,1.2f,1.1f};
-
-    glGenBuffers(1, &v_buffer_handle);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, v_buffer_handle);
-    glBindBuffer(GL_UNIFORM_BUFFER, v_buffer_handle);
-    glBufferData(GL_UNIFORM_BUFFER, 8 * sizeof(float), nullptr, GL_STATIC_DRAW);
-    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &strength);
-    glBufferSubData(GL_UNIFORM_BUFFER, 3*sizeof(float), 3*sizeof(float), color);
-    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    
-
+    ReadRam();
 }
