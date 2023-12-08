@@ -10,6 +10,8 @@
 #include <windows.h>
 #include <iostream>
 #include <cstdlib>
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 
 #include "Application/utils.h"
@@ -28,20 +30,32 @@ void SimpleShapeApplication::init() {
     }
 
     // A vector containing the x,y,z vertex coordinates for the triangle.
-    std::vector<GLfloat> vertices = {
-        -0.5f, 0.0f, 0.0f,  0.1f,0.5f,0.1f,
-        0.5f, 0.0f, 0.0f,   0.1f,0.5f,0.1f,
-        0.0f, 0.5f, 0.0f,   0.1f,0.5f,0.1f,
+   std::vector<GLfloat> vertices = {
+   -0.5f, 0.0f, 0.0f,  0.1f,0.5f,0.1f,
+   0.5f, 0.0f, 0.0f,   0.1f,0.5f,0.1f,
+   0.0f, 0.5f, 0.0f,   0.1f,0.5f,0.1f,
 
-        -0.5f, -0.5f, 0.0f, 0.5f,0.1f,0.1f,
-        0.5f, -0.5f, 0.0f,  0.5f,0.1f,0.1f,
-        -0.5f,  0.0f, 0.0f, 0.5f,0.1f,0.1f,
+   -0.5f, -0.5f, 0.0f, 0.5f,0.1f,0.1f,
+   0.5f, -0.5f, 0.0f,  0.5f,0.1f,0.1f,
+   -0.5f,  0.0f, 0.0f, 0.5f,0.1f,0.1f,
 
-        0.5f, -0.5f, 0.0f,  0.1f,0.1f,0.5f,
-        -0.5f, 0.0f, 0.0f,  0.1f,0.1f,0.5f,
-        0.5f,  0.0f, 0.0f,  0.1f,0.1f,0.5f};
+   0.5f, -0.5f, 0.0f,  0.1f,0.1f,0.5f,
+   -0.5f, 0.0f, 0.0f,  0.1f,0.1f,0.5f,
+   0.5f,  0.0f, 0.0f,  0.1f,0.1f,0.5f};
 
-   // std::vector<GLushort> indices = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    // A vector containing the x,y,z vertex coordinates for the triangle.
+   // std::vector<GLfloat> vertices = {
+   //     -0.5f, 0.0f, 0.0f,  0.81f,0.1f,0.1f,
+   //     0.5f, 0.0f, 0.0f,   0.81f,0.1f,0.1f,
+   //     0.0f, 0.5f, 0.0f,   0.81f,0.1f,0.1f,
+   //     -0.5f, 0.0f, 0.0f,  0.31f,0.1f,0.251f,
+   //     -0.5f, -0.5f, 0.0f, 0.31f,0.1f,0.251f,
+   //     0.5f, -0.5f, 0.0f,  0.31f,0.1f,0.251f,
+   //     0.5f,  0.0f, 0.0f,  0.31f,0.1f,0.251f};
+//
+   // std::vector<GLushort> indices = {0,1,2,3,4,5,6};
+
+    std::vector<GLushort> indices = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     
     // Generating the buffer and loading the vertex data into it.
     GLuint v_buffer_handle;
@@ -50,6 +64,13 @@ void SimpleShapeApplication::init() {
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    //generating indices buffer object
+    GLuint idx_buffer_handle;
+    glGenBuffers(1, &idx_buffer_handle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLushort), indices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
     // This setups a Vertex Array Object (VAO) that  encapsulates
     // the state of all vertex buffers needed for rendering
     glGenVertexArrays(1, &vao_);
@@ -66,12 +87,14 @@ void SimpleShapeApplication::init() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(3*sizeof(GLfloat)));
     
 
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(3*sizeof(GLfloat)));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
     glBindVertexArray(0);
     //end of vao "recording"
 
     Uniform();
-
+    MovingHouse();
 
     // Setting the background color of the rendering window,
     // I suggest not to use white or black for better debuging.
@@ -109,7 +132,27 @@ void SimpleShapeApplication::Uniform()
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &strength);
     glBufferSubData(GL_UNIFORM_BUFFER, 3*sizeof(float), 3*sizeof(float), color);
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
 
-    
+void SimpleShapeApplication::MovingHouse()
+{
+    //Generating the buffer and loading the vertex data into it.
+    GLuint v_buffer_handle;
 
+    float theta = 1.0*glm::pi<float>()/6.0f;
+    auto cs = std::cos(theta);
+    auto ss = std::sin(theta);  
+    glm::mat2 rot{cs, -ss, ss, cs};
+    glm::vec2 trans{0.0,  -0.25};
+    glm::vec2 scale{0.5, 0.5};
+
+    glGenBuffers(1, &v_buffer_handle);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, v_buffer_handle);
+    glBindBuffer(GL_UNIFORM_BUFFER, v_buffer_handle);
+    glBufferData(GL_UNIFORM_BUFFER, 8 * sizeof(float), nullptr, GL_STATIC_DRAW);
+    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 2*sizeof(float), &rot);
+    glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(float), 2*sizeof(float), &trans);
+    glBufferSubData(GL_UNIFORM_BUFFER, 4*sizeof(float), 2*sizeof(float), &scale);
+    //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

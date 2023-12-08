@@ -7,6 +7,12 @@ layout(binding = 0, std140) uniform Modifier {
     vec3  color; 
 };
 
+layout(std140, binding=1) uniform Transformations {
+ vec2 scale;
+ vec2 translation;
+ mat2 rotation;
+ };
+
 
 void main() {
     

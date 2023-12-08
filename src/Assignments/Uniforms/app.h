@@ -22,6 +22,8 @@ public:
 
     void Uniform();
 
+    void MovingHouse();
+
 private:
     GLuint vao_;
 };
