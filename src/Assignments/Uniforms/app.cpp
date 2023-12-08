@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 #include "Application/utils.h"
@@ -144,15 +145,16 @@ void SimpleShapeApplication::MovingHouse()
     auto ss = std::sin(theta);  
     glm::mat2 rot{cs, -ss, ss, cs};
     glm::vec2 trans{0.0,  -0.25};
-    glm::vec2 scale{0.5, 0.5};
+    glm::vec2 scale{1.5, 0.5};
 
     glGenBuffers(1, &v_buffer_handle);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, v_buffer_handle);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, v_buffer_handle);
     glBindBuffer(GL_UNIFORM_BUFFER, v_buffer_handle);
-    glBufferData(GL_UNIFORM_BUFFER, 8 * sizeof(float), nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 12 * sizeof(GLfloat), nullptr, GL_STATIC_DRAW);
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 2*sizeof(float), &rot);
-    glBufferSubData(GL_UNIFORM_BUFFER, 2*sizeof(float), 2*sizeof(float), &trans);
-    glBufferSubData(GL_UNIFORM_BUFFER, 4*sizeof(float), 2*sizeof(float), &scale);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 4 * sizeof(GLfloat), glm::value_ptr(rot[0]));
+    glBufferSubData(GL_UNIFORM_BUFFER, 16, 4 * sizeof(GLfloat), glm::value_ptr(rot[1]));
+    glBufferSubData(GL_UNIFORM_BUFFER, 32, 2 * sizeof(GLfloat), glm::value_ptr(trans));
+    glBufferSubData(GL_UNIFORM_BUFFER, 40, 2 * sizeof(GLfloat), glm::value_ptr(scale));
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
