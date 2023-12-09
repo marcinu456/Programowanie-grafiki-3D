@@ -153,8 +153,8 @@ void SimpleShapeApplication::MovingHouse()
     glBufferData(GL_UNIFORM_BUFFER, 12 * sizeof(GLfloat), nullptr, GL_STATIC_DRAW);
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 4 * sizeof(GLfloat), glm::value_ptr(rot[0]));
-    glBufferSubData(GL_UNIFORM_BUFFER, 16, 4 * sizeof(GLfloat), glm::value_ptr(rot[1]));
-    glBufferSubData(GL_UNIFORM_BUFFER, 32, 2 * sizeof(GLfloat), glm::value_ptr(trans));
-    glBufferSubData(GL_UNIFORM_BUFFER, 40, 2 * sizeof(GLfloat), glm::value_ptr(scale));
+    glBufferSubData(GL_UNIFORM_BUFFER, 4*sizeof(GLfloat), 4 * sizeof(GLfloat), glm::value_ptr(rot[1]));
+    glBufferSubData(GL_UNIFORM_BUFFER, 8*sizeof(GLfloat), 2 * sizeof(GLfloat), glm::value_ptr(trans));
+    glBufferSubData(GL_UNIFORM_BUFFER, 10*sizeof(GLfloat), 2 * sizeof(GLfloat), glm::value_ptr(scale));
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
