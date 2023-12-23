@@ -34,39 +34,39 @@ void SimpleShapeApplication::init() {
     std::vector<GLfloat> vertices =
         {
         //floor of pyramid
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,//0
-        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,//1
-        1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,//2
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,//3
+        -0.5f,  0.0f,   -0.5f,  0.0f, 0.0f, 1.0f,//0
+        -0.5f,  0.0f,   0.5f,   0.0f, 0.0f, 1.0f,//1
+        0.5f,   0.0f,   -0.5f,  0.0f, 0.0f, 1.0f,//2
+        0.5f,   0.0f,   0.5f,   0.0f, 0.0f, 1.0f,//3
         //front wall
-        -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,//4
-        1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,//5
-        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,//6
+        -0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f,//4
+        0.0f, 1.f, 0.0f, 0.0f, 1.0f, 0.0f,//5
+        0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f,//6
         //right wall
-        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,//7
-        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f,//8
-        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,//9
+        0.5f, 0.0f, -0.5f, 1.0f, 0.0f, 0.0f,//7
+        0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,//8
+        0.5f, 0.0f, 0.5f, 1.0f, 0.0f, 0.0f,//9
         //back wall
-        1.0f, -1.0f, 1.0f, 0.0f, 0.5f, 1.0f,//10
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.5f, 1.0f,//11
-        0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f,//12
+        -0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f,//10
+        0.f, 1.f, 0.f, 0.0f, 0.5f, 1.0f,//11
+        0.5f, 0.f, 0.5f, 0.0f, 0.5f, 1.0f,//12
         //left wall
-        -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0.0f,//13
-        -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0.0f,//14
-        0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,//15
+        -0.5f, 0.f, 0.5f, 1.0f, 1.0f, 0.0f,//13
+        0.f, 1.f, 0.f, 1.0f, 1.0f, 0.0f,//14
+        -0.5f, 0.f, -0.5f,1.0f, 1.0f, 0.0f,//15
         };
 
     std::vector<GLuint> indices =
         {
         //floor of pyramid
-        0, 1, 2,
-        0, 2, 3,
+        0, 2, 1,
+        1, 2, 3,
         //front wall
         4, 5, 6,
         //right wall
         7, 8, 9,
         //back wall
-        10, 11, 12,
+        11, 10, 12,
         //left wall
         13, 14, 15,
         };
@@ -159,7 +159,7 @@ void SimpleShapeApplication::PVM()
     
     //PVM
     glm::mat4 Projection = glm::perspective(
-        glm::radians(60.f), // field of view in degrees
+        glm::radians(80.f), // field of view in degrees
         width / height, // aspect ratio
         0.1f, // near plane
         100.0f); // far plane
@@ -170,14 +170,10 @@ void SimpleShapeApplication::PVM()
         glm::vec3(0.0f, 1.0f, 0.0f));  // Head is up (set to 0,-1,0 to look upside-down)
         
     glm::mat4 Model = glm::mat4(1.0f);
-    Model = glm::rotate(Model, glm::radians(45.f), glm::vec3(0.0f, 1.0f, 0.0f));
-    Model = glm::translate(Model, glm::vec3(0.0f, -1.0f, 0.0f));
-    
-    
 
+    
     glm::mat4 PVM = Projection * View * Model;
-
-
+    
     //Generating the buffer and loading the vertex data into it.
     GLuint v_buffer_handle;
     
