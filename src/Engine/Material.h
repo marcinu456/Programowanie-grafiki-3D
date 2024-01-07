@@ -13,6 +13,7 @@ namespace xe {
 
     class Material {
     public:
+        virtual ~Material() = default;
         virtual void bind() = 0;
 
         virtual void unbind() {};
@@ -22,7 +23,7 @@ namespace xe {
     public:
         ColorMaterial(const glm::vec4 color) : color_(color) {}
 
-        void bind();
+        void bind() override;
 
         static void init();
 

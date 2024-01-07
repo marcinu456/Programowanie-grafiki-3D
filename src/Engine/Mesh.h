@@ -5,10 +5,13 @@
 #pragma once
 
 #include <vector>
+
 #include "glad/gl.h"
 
 
 namespace xe {
+    class Material;
+
 
     struct SubMesh {
         SubMesh(GLuint start, GLuint end) : start(start), end(end) {}
@@ -33,8 +36,9 @@ namespace xe {
 
         void vertex_attrib_pointer(GLuint index, GLuint size, GLenum type, GLsizei stride, GLsizei offset);
 
-        void add_submesh(GLuint start, GLuint end) {
+        void add_submesh(GLuint start, GLuint end, Material* mat = nullptr) {
             submeshes_.push_back({start, end});
+            materialas_.push_back(mat);
         }
 
         void draw() const;
@@ -47,6 +51,7 @@ namespace xe {
 
         std::vector<SubMesh> submeshes_;
 
+        std::vector<Material*> materialas_;
     };
 
 }

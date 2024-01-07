@@ -6,12 +6,30 @@
 
 #include "Mesh.h"
 
+#include <functional>
+
+#include "Material.h"
+
 void xe::Mesh::draw() const {
     glBindVertexArray(vao_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, i_buffer_);
+    for (auto i = 0; i < materialas_.size(); i++) {
+        if(materialas_[i]) {
+            materialas_[i]->bind();
+        } else {
+            std::cout << "No material" << std::endl;
+        }
+    }
     for (auto i = 0; i < submeshes_.size(); i++) {
         glDrawElements(GL_TRIANGLES, submeshes_[i].count(), GL_UNSIGNED_SHORT,
                        reinterpret_cast<void *>(sizeof(GLushort) * submeshes_[i].start));
+    }
+    for (auto i = 0; i < materialas_.size(); i++) {
+        if(materialas_[i]) {
+            materialas_[i]->unbind();
+        } else {
+            std::cout << "No material" << std::endl;
+        }
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0u);
     glBindVertexArray(0u);
