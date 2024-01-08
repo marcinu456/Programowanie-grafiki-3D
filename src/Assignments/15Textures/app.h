@@ -15,16 +15,12 @@
 #include "camera.h"
 #include "camera_controler.h"
 #include "Engine/Mesh.h"
-#include "Engine/Material.h"
 
 
 class SimpleShapeApplication : public xe::Application
 {
 public:
-    SimpleShapeApplication(int width, int height, std::string title, bool debug) : Application(width, height, title,
-        debug), m_color_material(glm::vec4{ 0.7f, 0.7f, 0.7f, 1.0f })
-    {
-    }
+    SimpleShapeApplication(int width, int height, std::string title, bool debug) : Application(width, height, title, debug) {}
 
     ~SimpleShapeApplication() {
         if (camera_) {
@@ -73,16 +69,12 @@ private:
     void set_camera_controler(CameraControler *camera_controler) { camera_controler_ = camera_controler; }
 
     //Meshes
-    void SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLushort> indices);
 
-    //Textures
-    void SetTextures();
+    void SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLushort> indices);
     
     std::vector<xe::Mesh*> meshes_;
     void add_submesh(xe::Mesh *mesh) {
         meshes_.push_back(mesh);
     }
-
-    //Materials
-    xe::ColorMaterial m_color_material;
+    
 };
