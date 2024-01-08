@@ -57,8 +57,6 @@ private:
 
     void SetCameraPVM();
     
-    GLuint vao_;
-    
     GLuint u_pvm_buffer_;
 
     //Camera
