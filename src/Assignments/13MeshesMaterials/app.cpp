@@ -18,9 +18,6 @@
 #include "Engine/Mesh.h"
 #include "Engine/Material.h"
 
-#define STB_IMAGE_IMPLEMENTATION  1
-
-#include "3rdParty/stb/stb_image.h"
 
 
 void SimpleShapeApplication::init() {
@@ -68,8 +65,7 @@ void SimpleShapeApplication::init() {
     std::vector<GLushort> indices = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
     };
-
-    SetTextures();
+    
     SetMeshes(vertices, indices);
     //Uniform();
     SetCameraPVM();
@@ -84,14 +80,12 @@ void SimpleShapeApplication::init() {
     glViewport(0, 0, w, h);
 
     glUseProgram(program);
-
-
 }
 
 //This functions is called every frame and does the actual rendering.
 void SimpleShapeApplication::frame()
 {
-    m_color_material.bind();
+    
     glm::mat4 PVM = camera_->GetPVM();
     glBindBuffer(GL_UNIFORM_BUFFER, u_pvm_buffer_);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &PVM[0]);
@@ -209,34 +203,12 @@ void SimpleShapeApplication::SetMeshes(std::vector<GLfloat> &vertices, std::vect
     MeshPyramid_->allocate_index_buffer(indices.size() * sizeof(GLfloat), GL_STATIC_DRAW);
     MeshPyramid_->load_indices(0, indices.size() * sizeof(GLfloat), indices.data());
 
-   // xe::ColorMaterial g=xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},0,0);
     
-    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},m_color_material.get_texture())  );
+    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f})  );
     MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f})  );
     MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f})  );
     MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f})  );
     MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f})  );
     add_submesh(MeshPyramid_);
     
-}
-
-void SimpleShapeApplication::SetTextures()
-{
-    stbi_set_flip_vertically_on_load(true);
-    GLint width, height, channels;
-    auto texture_file = std::string(ROOT_DIR) + "/Models/multicolor.png";
-    auto img = stbi_load(texture_file.c_str(), &width, &height, &channels, 0);
-    if (!img) {
-        //spdlog::warn("Could not read image from file `{}'", texture_file);
-        std::cerr << "Could not read image from file `{}'" << texture_file << std::endl;
-    }
-    //textures
-    GLuint texture_ = 0;
-    glGenTextures(1, &texture_);
-    glBindTexture(GL_TEXTURE_2D, texture_);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    m_color_material.set_texture(texture_);
 }
