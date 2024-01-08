@@ -36,85 +36,38 @@ void SimpleShapeApplication::init() {
 
     // This is a set of vertices positions
     // The layout is described in the vertex shader
-    std::vector<GLfloat> vertices =
-        {
-        //floor of pyramid
-        -0.5f,  0.0f,   -0.5f,//1
-        -0.5f,  0.0f,   0.5f,//2
-        0.5f,   0.0f,   -0.5f,//3
-        0.5f,   0.0f,   0.5f,//4
-        //front wall
-        -0.5f, 0.0f, -0.5f,//5
-        0.0f, 1.f, 0.0f,//6
-        0.5f, 0.0f, -0.5f,//7
-        //right wall
-        0.5f, 0.0f, -0.5f,//8
-        0.0f, 1.0f, 0.0f,//9
-        0.5f, 0.0f, 0.5f,//10
-        //back wall
-        -0.5f, 0.0f, 0.5f,//11
-        0.f, 1.f, 0.f,//12
-        0.5f, 0.f, 0.5f,//13
-        //left wall
-        -0.5f, 0.f, 0.5f,//14
-        0.f, 1.f, 0.f,//15
-        -0.5f, 0.f, -0.5f,//16
-        };
+    std::vector<GLfloat> vertices = {
+        0.5f, -0.5f, 0.0f,//front wall
+        0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f, 0.0f,
 
-    std::vector<GLuint> indices =
-        {
-        //floor of pyramid
-        0, 2, 1,
-        1, 2, 3,
-        //front wall
-        4, 5, 6,
-        //right wall
-        7, 8, 9,
-        //back wall
-        11, 10, 12,
-        //left wall
-        13, 14, 15,
-        };
+        -0.5f, -0.5f, 0.0f,//right wall
+        0.0f, 0.0f, 1.0f,
+        -0.5f, 0.5f, 0.0f,
+
+        -0.5f, 0.5f, 0.0f,//back wall
+        0.0f, 0.0f, 1.0f,
+        0.5f, 0.5f, 0.0f,
+
+        0.5f, 0.5f, 0.0f,//left wall
+        0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, 0.0f,
+
+        0.5f, -0.5f, 0.0f,//bottom
+        -0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+
+        0.5f, -0.5f, 0.0f,//bottom
+        -0.5f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f
+    };
+
+    std::vector<GLushort> indices = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    };
     
-    
-    // Generating the buffer and loading the vertex data into it.
-    GLuint v_buffer_handle;
-    glGenBuffers(1, &v_buffer_handle);
-    OGL_CALL(glBindBuffer(GL_ARRAY_BUFFER, v_buffer_handle));
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //generating indices buffer object
-    GLuint idx_buffer_handle;
-    glGenBuffers(1, &idx_buffer_handle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    // This setups a Vertex Array Object (VAO) that  encapsulates
-    // the state of all vertex buffers needed for rendering
-    glGenVertexArrays(1, &vao_);
-    glBindVertexArray(vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, v_buffer_handle);
-
-
-    // This indicates that the data for attribute 0 should be read from a vertex buffer.
-    glEnableVertexAttribArray(0);
-    // and this specifies how the data is layout in the buffer.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(0));
-    
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid *>(3 * sizeof(GLfloat)));
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buffer_handle);
-    glBindVertexArray(0);
-    //end of vao "recording"
-    
-
-
     SetMeshes(vertices, indices);
-    Uniform();
+    //Uniform();
     SetCameraPVM();
 
     
@@ -139,12 +92,6 @@ void SimpleShapeApplication::frame()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    
-    // Binding the VAO will setup all the required vertex buffers.
-    glBindVertexArray(vao_);
-    //glDrawArrays(GL_TRIANGLES, 0, 9);
-    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
-    glBindVertexArray(0);
 
     // MeshesMaterials
     for (auto m: meshes_) {
@@ -245,7 +192,7 @@ void SimpleShapeApplication::SetCameraPVM()
     set_camera_controler(new CameraControler(camera_));
 }
 
-void SimpleShapeApplication::SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLuint> indices)
+void SimpleShapeApplication::SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLushort> indices)
 {
     //meshes
     auto MeshPyramid_ = new xe::Mesh;
@@ -257,11 +204,11 @@ void SimpleShapeApplication::SetMeshes(std::vector<GLfloat> &vertices, std::vect
     MeshPyramid_->load_indices(0, indices.size() * sizeof(GLfloat), indices.data());
 
     
-    MeshPyramid_->add_submesh(0, 4, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(4, 7, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(7, 10, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(10, 13, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(13, 16, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f})  );
     add_submesh(MeshPyramid_);
     
 }

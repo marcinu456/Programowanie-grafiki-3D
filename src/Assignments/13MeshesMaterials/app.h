@@ -70,7 +70,7 @@ private:
 
     //Meshes
 
-    void SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLuint> indices);
+    void SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLushort> indices);
     
     std::vector<xe::Mesh*> meshes_;
     void add_submesh(xe::Mesh *mesh) {
