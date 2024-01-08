@@ -47,14 +47,11 @@ namespace xe {
         shader_ = program;
 
         glGenBuffers(1, &color_uniform_buffer_);
-
         glBindBuffer(GL_UNIFORM_BUFFER, color_uniform_buffer_);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) + sizeof(GLint), nullptr, GL_STATIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0u);
 
-        glGetUniformLocation(program, "Kd");
-
-        uniform_map_Kd_location_ = glGetUniformLocation(program, "map_Kd");
+        uniform_map_Kd_location_ = glGetUniformLocation(shader_, "map_Kd");
         if (uniform_map_Kd_location_ == -1) {
             std::cerr << "Cannot get uniform map_Kd location" << std::endl;
         }

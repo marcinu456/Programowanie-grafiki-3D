@@ -40,29 +40,28 @@ void SimpleShapeApplication::init() {
     // This is a set of vertices positions
     // The layout is described in the vertex shader
     std::vector<GLfloat> vertices = {
-        0.5f, -0.5f, 0.0f,//front wall
-        0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.0f,
-
-        -0.5f, -0.5f, 0.0f,//right wall
-        0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.0f,
-
-        -0.5f, 0.5f, 0.0f,//back wall
-        0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.0f,
-
-        0.5f, 0.5f, 0.0f,//left wall
-        0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.0f,
-
-        0.5f, -0.5f, 0.0f,//bottom
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-
-        0.5f, -0.5f, 0.0f,//bottom
-        -0.5f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f
+        -0.5f, 0.0f, -0.5f, 0.191f, 0.5f,  
+        0.5f, 0.0f, -0.5f, 0.5f, 0.191f,   
+        0.5f, 0.0f, 0.5f, 0.809f, 0.5f,   
+        0.5f, 0.0f, 0.5f, 0.809f, 0.5f,   
+        -0.5f, 0.0f, 0.5f, 0.5f, 0.809f,  
+        -0.5f, 0.0f, -0.5f, 0.191f, 0.5f,  
+        
+        0.5f, 0.0f, -0.5f, 0.5f, 0.191f,    
+        -0.5f, 0.0f, -0.5f, 0.191f, 0.5f,  
+        0.0f, 1.0f, 0.0f, 0.0f, 0.0f,     
+        
+        0.5f, 0.0f, 0.5f, 0.809f, 0.5f,    
+        0.5f, 0.0f, -0.5f, 0.5f, 0.191f,   
+        0.0f, 1.0f, 0.0f, 1.0f, 0.0f,    
+        
+        -0.5f, 0.0f, 0.5f, 0.5f, 0.809f,   
+        0.5f, 0.0f, 0.5f, 0.809f, 0.5f,    
+        0.0f, 1.0f, 0.0f, 1.0f, 1.0f,    
+        
+        -0.5f, 0.0f, -0.5f, 0.191f, 0.5f,    
+        -0.5f, 0.0f, 0.5f, 0.5f, 0.809f,    
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f,      
     };
 
     std::vector<GLushort> indices = {
@@ -204,23 +203,25 @@ void SimpleShapeApplication::SetMeshes(std::vector<GLfloat> &vertices, std::vect
     auto MeshPyramid_ = new xe::Mesh;
     MeshPyramid_->allocate_vertex_buffer(vertices.size() * sizeof(GLfloat), GL_STATIC_DRAW);
     MeshPyramid_->load_vertices(0, vertices.size() * sizeof(GLfloat), vertices.data());
-    MeshPyramid_->vertex_attrib_pointer(0, 3, GL_FLOAT, 3 * sizeof(GLfloat), 0);
+    MeshPyramid_->vertex_attrib_pointer(0, 3, GL_FLOAT, 5 * sizeof(GLfloat), 0);
+    MeshPyramid_->vertex_attrib_pointer(1, 2, GL_FLOAT, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
 
     MeshPyramid_->allocate_index_buffer(indices.size() * sizeof(GLfloat), GL_STATIC_DRAW);
     MeshPyramid_->load_indices(0, indices.size() * sizeof(GLfloat), indices.data());
 
-   // xe::ColorMaterial g=xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},0,0);
+    auto Texture = SetTextures();
     
-    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},m_color_material.get_texture())  );
-    MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f})  );
-    MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f})  );
+    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},Texture)  );
+    MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f},Texture)  );
+    MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f},Texture)  );
+    MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f},Texture)  );
+    MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f},Texture)  );
     add_submesh(MeshPyramid_);
+
     
 }
 
-void SimpleShapeApplication::SetTextures()
+GLuint SimpleShapeApplication::SetTextures()
 {
     stbi_set_flip_vertically_on_load(true);
     GLint width, height, channels;
@@ -238,5 +239,8 @@ void SimpleShapeApplication::SetTextures()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    m_color_material.set_texture(texture_);
+
+
+    
+    return texture_;
 }

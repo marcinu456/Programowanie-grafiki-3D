@@ -74,7 +74,7 @@ private:
     void SetMeshes(std::vector<GLfloat> &vertices, std::vector<GLushort> indices);
 
     //Textures
-    void SetTextures();
+    GLuint SetTextures();
     
     std::vector<xe::Mesh*> meshes_;
     void add_submesh(xe::Mesh *mesh) {
