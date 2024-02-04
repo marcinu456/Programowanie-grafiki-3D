@@ -1,14 +1,8 @@
 //
 // Created by Piotr Białas on 04/11/2021.
 //
-
-
-
 #include "mesh_loader.h"
-
 #include <memory>
-
-
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #define GLM_ENABLE_EXPERIMENTAL
@@ -16,9 +10,10 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "ObjectReader/obj_reader.h"
-#include "Engine/Material.h"
+#include "Engine/ColorMaterial.h"
 #include "Engine/PhongMaterial.h"
 #include "Engine/Mesh.h"
+#include "Engine/texture.h"
 
 
 namespace {
@@ -110,7 +105,8 @@ namespace xe {
                     case 0:
                         material = make_color_material(mat, mtl_dir);
                         break;
-                    case 1:
+                case 1:
+                        std::cout << "Phong material" << std::endl;
                         material = make_phong_material(mat, mtl_dir);
                         break;
                 }
@@ -153,7 +149,18 @@ namespace xe {
                 color[i] = mat.diffuse[i];
             color[3] = 1.0;
             spdlog::debug("Adding ColorMaterial {}", glm::to_string(color));
-            auto material = new xe::PhongMaterial(color);
+            glm::vec3 specular;
+            for(int i = 0; i < 3; i++) {
+                specular[i] = mat.specular[i];
+            }
+            std::cout<<"add specular "<<glm::to_string(specular)<<std::endl;
+            glm::vec3 ambient;
+            for(int i = 0; i < 3; i++) {
+                ambient[i] = mat.ambient[i];
+            }
+            std::cout<<"add ambient "<<glm::to_string(ambient)<<std::endl;
+            float specularStrength = mat.shininess;
+            auto material = new xe::PhongMaterial(color, ambient, specular, specularStrength);
             if (!mat.diffuse_texname.empty()) {
                 auto texture = xe::create_texture(mtl_dir + "/" + mat.diffuse_texname);
                 spdlog::debug("Adding Texture {} {:1d}", mat.diffuse_texname, texture);
