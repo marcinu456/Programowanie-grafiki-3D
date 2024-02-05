@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <Engine/ColorMaterial.h>
 
 #include "Application/application.h"
 #include "Application/utils.h"
@@ -14,19 +15,17 @@
 
 #include "camera.h"
 #include "camera_controler.h"
-#include "Engine/ColorMaterial.h"
-#include "Engine/Light.h"
 #include "Engine/Mesh.h"
-#include "Engine/Material.h"
+#include "Engine/Light.h"
 
-struct MatrixesBlockStruct {
-    glm::mat4 VM;
-    glm::mat4 N;
-};
-
-struct LightBlockStruct {
+struct LightsArray {
     xe::PointLight light[24];
     int num_lights;
+};
+
+struct MatrixesArray {
+    glm::mat4 VM;
+    glm::mat3 N;
 };
 
 class SimpleShapeApplication : public xe::Application
@@ -96,20 +95,19 @@ private:
     xe::ColorMaterial m_color_material;
 
     std::shared_ptr<xe::Mesh> mesh;
-    std::shared_ptr<xe::Mesh> meshsquere;
+
+    //light
+    std::vector<xe::PointLight> p_lights_;
+    glm::vec3 ambient_;
 
     GLuint Matrixes;
-    
     GLuint Lights;
-    glm::vec3 ambient_;
-    std::vector<xe::PointLight> p_lights_;
-
+    
     void add_light(const xe::PointLight &p_light) {
-        p_lights_.push_back(p_light); 
+        p_lights_.push_back(p_light);
     }
 
     void add_ambient(glm::vec3 ambient) {
         ambient_ = ambient;
     }
-    
 };

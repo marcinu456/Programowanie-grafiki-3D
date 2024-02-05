@@ -58,6 +58,11 @@ public:
         Model = model;
     }
 
+    //Get Model
+    glm::mat4 get_model() const {
+        return Model;
+    }
+
     void set_aspect(float aspect) {
         aspect_ = aspect;
     }
@@ -83,7 +88,6 @@ public:
 
     glm::mat4 projection() const { return glm::perspective(fov_, aspect_, near_, far_); }
 
-    glm::mat4 GetModel() { return Model; }
     
     glm::mat4 GetPVM()
     {

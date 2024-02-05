@@ -1,8 +1,13 @@
-﻿#pragma once
+//
+// Created by Piotr Białas on 13/12/2021.
+//
+
+#pragma once
 
 #include "glm/glm.hpp"
 
-namespace xe {
+namespace xe
+{
     struct PointLight {
         PointLight() = default;
         PointLight(const glm::vec3 &pos, const glm::vec3 &color, float intensity, float radius)

@@ -16,14 +16,13 @@
 
 #include "Application/utils.h"
 #include "Engine/Mesh.h"
-#include "Engine/Material.h"
+#include "Engine/ColorMaterial.h"
+#include "Engine/PhongMaterial.h"
 #include "Engine/mesh_loader.h"
 
 #define STB_IMAGE_IMPLEMENTATION  1
 
 #include "3rdParty/stb/stb_image.h"
-#include "Engine/PhongMaterial.h"
-#include "XeEngine/lights.h"
 
 
 void SimpleShapeApplication::init() {
@@ -40,43 +39,35 @@ void SimpleShapeApplication::init() {
 
     xe::ColorMaterial::init();
     xe::PhongMaterial::init();
-
-    //Obj meshes
-    mesh = xe::load_mesh_from_obj(std::string(ROOT_DIR) + "/Models/pyramid.obj",
-                                        std::string(ROOT_DIR) + "/Models");
-
-    meshsquere = xe::load_mesh_from_obj(std::string(ROOT_DIR) + "/Models/square.obj",
+    
+    mesh = xe::load_mesh_from_obj(std::string(ROOT_DIR) + "/Models/square.obj",
                                         std::string(ROOT_DIR) + "/Models");
     add_submesh(mesh.get());
-    add_submesh(meshsquere.get());
 
-    //Light
-    auto light = new xe::PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f);
-
-    add_light(*light);
-    
-    
     SetCameraPVM();
 
-    //Light buffer
-    glGenBuffers(1, &Lights);
-    glBindBuffer(GL_UNIFORM_BUFFER, Lights);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBlockStruct), nullptr, GL_STATIC_DRAW);
+    //light
+    auto light = new xe::PointLight(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.09f);
+    auto light1 = new xe::PointLight(glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1.0f, 0.09f);
+    add_light(*light);
+    add_light(*light1);
 
-    //Matrixes buffer
     glGenBuffers(1, &Matrixes);
     glBindBuffer(GL_UNIFORM_BUFFER, Matrixes);
     glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
 
-    //uniforms buffer
+    glGenBuffers(1, &Lights);
+    glBindBuffer(GL_UNIFORM_BUFFER, Lights);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(LightsArray), nullptr, GL_STATIC_DRAW);
+
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, Matrixes);
     glBindBuffer(GL_UNIFORM_BUFFER, Matrixes);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 3, Lights);
     glBindBuffer(GL_UNIFORM_BUFFER, Lights);
 
-    //Set ambientlight
-    xe::PhongMaterial::set_ambient(glm::vec3(0.2f, 0.2f, 0.2f));
+    // Set ambient light
+    xe::PhongMaterial::set_ambient(glm::vec3(0.1f, 0.1f, 0.1f));
     
     // Setting the background color of the rendering window,
     // I suggest not to use white or black for better debuging.
@@ -96,26 +87,27 @@ void SimpleShapeApplication::frame()
 {
     m_color_material.bind();
     glm::mat4 PVM = camera_->GetPVM();
-
-
     glBindBuffer(GL_UNIFORM_BUFFER, u_pvm_buffer_);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &PVM[0]);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    MatrixesBlockStruct matrixes{};
-    auto R = glm::mat3(camera_->view() * camera_->GetModel());
+    auto vm = camera_->view() * camera_->get_model();
+    auto R = glm::mat3(vm);
     auto N = glm::mat3(glm::cross(R[1], R[2]), glm::cross(R[2], R[0]), glm::cross(R[0], R[1]));
-    matrixes.VM = camera_->view() * camera_->GetModel();
-    matrixes.N = N;
+
+    MatrixesArray matricesBlock{};
+
+    matricesBlock.N = N;
+    matricesBlock.VM = vm;
 
     glBindBuffer(GL_UNIFORM_BUFFER, Matrixes);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MatrixesBlockStruct), &matrixes);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MatrixesArray), &matricesBlock);
 
     glBindBuffer(GL_UNIFORM_BUFFER, Lights);
 
-    LightBlockStruct lightBlock{};
+    LightsArray lightBlock{};
 
     lightBlock.num_lights = p_lights_.size();
 
@@ -123,8 +115,8 @@ void SimpleShapeApplication::frame()
         lightBlock.light[i] = p_lights_[i];
     }
 
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightBlockStruct), &lightBlock);
-
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightsArray), &lightBlock);
+    
     // MeshesMaterials
     for (auto m: meshes_) {
         m->draw();
@@ -209,7 +201,7 @@ void SimpleShapeApplication::SetCameraPVM()
         0.1f,
         100.0f));
 
-    camera_->look_at(glm::vec3(0.0f, 10.f, 5.f), // Camera is at (0,-10,-10), in World Space
+    camera_->look_at(glm::vec3(0.0f, 10.f, 15.f), // Camera is at (0,-10,-10), in World Space
         glm::vec3(0.0f, 0.0f, 0.0f), // and looks at the origin
         glm::vec3(0.f, 1.f, 0.f)); // Head is up (set to 0,-1,0 to look upside-down)
     
@@ -238,11 +230,11 @@ void SimpleShapeApplication::SetPyramidMeshes(std::vector<GLfloat> &vertices, st
 
     auto Texture = SetTextures();
     
-    MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},Texture)  );
-    MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f},Texture)  );
-    MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f},Texture)  );
-    MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f},Texture)  );
-    MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f},Texture)  );
+   // MeshPyramid_->add_submesh(0, 3, new xe::ColorMaterial({1.0f, 0.0f, 0.0f, 1.0f},Texture)  );
+  //  MeshPyramid_->add_submesh(3, 6, new xe::ColorMaterial({0.0f, 1.0f, 0.0f, 1.0f},Texture)  );
+  //  MeshPyramid_->add_submesh(6, 9, new xe::ColorMaterial({0.0f, 0.0f, 1.0f, 1.0f},Texture)  );
+  //  MeshPyramid_->add_submesh(9, 12, new xe::ColorMaterial({1.0f, 1.0f, 0.0f, 1.0f},Texture)  );
+  //  MeshPyramid_->add_submesh(12, 18, new xe::ColorMaterial({0.0f, 1.0f, 1.0f, 1.0f},Texture)  );
     add_submesh(MeshPyramid_);
 
     

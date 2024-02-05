@@ -1,10 +1,12 @@
 //
 // Created by Piotr Białas on 04/11/2021.
 //
+
 #include "mesh_loader.h"
+
 #include <memory>
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_sinks.h"
+
+#include "texture.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -13,7 +15,7 @@
 #include "Engine/ColorMaterial.h"
 #include "Engine/PhongMaterial.h"
 #include "Engine/Mesh.h"
-#include "Engine/texture.h"
+using namespace glm;
 
 
 namespace {
@@ -36,7 +38,7 @@ namespace xe {
         auto n_indices = 3 * smesh.faces.size();
 
 
-        glm::uint n_floats_per_vertex = 3;
+        uint n_floats_per_vertex = 3;
         for (auto &&t: smesh.has_texcoords) {
             if (t)
                 n_floats_per_vertex += 2;
@@ -84,6 +86,10 @@ namespace xe {
         }
         if (smesh.has_normals) {
             mesh->vertex_attrib_pointer(xe::sMesh::MAX_TEXCOORDS + 1, 3, GL_FLOAT, stride, offset);
+            auto v_offset = offset;
+            for (auto i = 0; i < smesh.vertex_normals.size(); i++, v_offset += stride) {
+                std::memcpy(v_ptr + v_offset, glm::value_ptr(smesh.vertex_normals[i]), sizeof(glm::vec3));
+            }
             offset += 3 * sizeof(GLfloat);
         }
 
